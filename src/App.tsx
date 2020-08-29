@@ -1,26 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Suspense, useEffect, useState } from 'react';
 
-function App() {
+import Loader from 'containers/loader';
+import PageList, { IPage } from 'containers/pagelist';
+import FBLoginButton from 'components/FBLogin';
+
+import { makeStyles } from '@material-ui/core/styles';
+import { ILogin } from 'contexts/login';
+
+import fbApi from 'api/fb';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+  },
+}));
+
+interface IAppProps {
+  login: ILogin;
+}
+
+const App: React.FC<IAppProps> = ({ login }) => {
+  const classes = useStyles();
+  const [pages, setPages] = useState<IPage[]>([]);
+  const [selectedPage, setSelectedPage] = useState<string>('');
+
+  useEffect(() => {
+    (async () => {
+      if (login.state.loggedIn) {
+        const { data: pages } = await fbApi.getPages(login.state.accessToken);
+
+        setPages(pages);
+      }
+    })();
+  }, [login.state, setPages]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={classes.root}>
+      <Suspense fallback={<Loader />}></Suspense>
+      {pages.length && (
+        <PageList pages={pages} setSelectedPage={setSelectedPage} />
+      )}
+      {login.state.loggedIn && <FBLoginButton login={login} />}
     </div>
   );
-}
+};
 
 export default App;
