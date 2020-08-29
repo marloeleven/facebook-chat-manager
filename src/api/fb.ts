@@ -1,11 +1,15 @@
 import CONFIG from 'const/config';
+import lscache from 'lscache';
+import isEmpty from 'lodash/isEmpty';
+import { IPage, IVideo } from 'types';
 
 interface IURLParams {
   [key: string]: any;
 }
 
-interface IApiResult {
-  data: any[];
+interface ICacheList {
+  id: string;
+  list: [];
 }
 
 const generateURL = (paramsObj: IURLParams) => {
@@ -16,30 +20,60 @@ const generateURL = (paramsObj: IURLParams) => {
   return { baseURL, params };
 };
 
+const VIDEOS = 'videos';
 export const getLiveVideos = (
-  id: string | number,
+  pageId: string,
   access_token: string
-): Promise<IApiResult> => {
+): Promise<IVideo[]> => {
   const { baseURL, params } = generateURL({ access_token });
 
-  return new Promise((resolve, reject) => {
-    const result = fetch(`${baseURL}/${id}/live_videos?status=LIVE&${params}`)
+  return new Promise(async (resolve, reject) => {
+    const cache: ICacheList = lscache.get(VIDEOS);
+
+    if (!isEmpty(cache) && cache && cache.id === pageId) {
+      resolve(cache.list);
+      return;
+    }
+
+    const { data } = await fetch(
+      `${baseURL}/${pageId}/live_videos?status=id,name,status&${params}&filtering=[{ field: 'status', operator: 'EQUAL', value: 'LIVE' }]&limit=10`
+    )
       .then((r) => r.json())
       .catch(reject);
 
-    resolve(result);
+    // lscache.set(VIDEOS, {
+    //   id: pageId,
+    //   list: data,
+    // });
+
+    resolve(data);
   });
 };
 
-export const getPages = (access_token: string): Promise<IApiResult> => {
+const PAGES = 'pages';
+export const getPages = (
+  userId: string,
+  access_token: string
+): Promise<IPage[]> => {
   const { baseURL, params } = generateURL({ access_token });
 
-  return new Promise((resolve, reject) => {
-    const result = fetch(`${baseURL}/me/accounts?fields=id,name&${params}`)
+  return new Promise(async (resolve, reject) => {
+    const cache: ICacheList = lscache.get(PAGES);
+
+    if (!isEmpty(cache) && cache && cache.id === userId) {
+      resolve(cache.list);
+      return;
+    }
+
+    const { data } = await fetch(
+      `${baseURL}/me/accounts?fields=id,name,access_token&${params}`
+    )
       .then((r) => r.json())
       .catch(reject);
 
-    resolve(result);
+    lscache.set(PAGES, data);
+
+    resolve(data);
   });
 };
 

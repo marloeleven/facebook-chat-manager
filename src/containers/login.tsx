@@ -1,15 +1,16 @@
 import React, { useCallback } from 'react';
+import { useDispatch } from 'react-redux';
 
 import useEffectOnce from 'hooks/useEffectOnce';
 import Button from '@material-ui/core/Button';
 
 import CONFIG from 'const/config';
 
-import { ILogin } from 'contexts/login';
+import * as appActions from 'slices/app';
 
 interface IFBData {
   accessToken: string;
-  userId: string;
+  userID: string;
 }
 
 interface IFBloginResult {
@@ -17,24 +18,20 @@ interface IFBloginResult {
   status: string;
 }
 
-interface IProps {
-  loginStatus: boolean;
-  onClickLogin: Function;
-  [key: string]: any;
-}
-
 const _window = window as any;
 
-export default ({ login }: { login: ILogin }) => {
+export default (props: any) => {
+  const dispatch = useDispatch();
+
   const checkLoginStatus = useCallback(
     ({ authResponse, status }: IFBloginResult) => {
       if (status === 'connected') {
-        const { accessToken, userId } = authResponse;
+        const { accessToken, userID: userId } = authResponse;
 
-        login.setData({ accessToken, userId, loggedIn: true });
+        dispatch(appActions.setLoginState({ accessToken, userId }));
       }
     },
-    [login]
+    [dispatch]
   );
 
   const onClickLogin = useCallback(() => {

@@ -9,7 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 
 import Search from 'components/search';
-import Lang from 'components/lang';
+// import Lang from 'components/lang';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,19 +27,19 @@ export default () => {
   const classes = useStyles();
 
   return (
-    <AppBar position="fixed" className={classes.appBar}>
-      <Toolbar variant="dense">
+    <AppBar position='fixed' className={classes.appBar}>
+      <Toolbar variant='dense'>
         <IconButton
-          edge="start"
+          edge='start'
           className={classes.menuButton}
-          color="inherit"
-          aria-label="menu"
+          color='inherit'
+          aria-label='menu'
         >
           <MenuIcon />
         </IconButton>
 
-        <Typography variant="h6" color="inherit">
-          <Lang>companyName</Lang>
+        <Typography variant='h6' color='inherit'>
+          {/* <Lang>companyName</Lang> */}
         </Typography>
 
         <Search />

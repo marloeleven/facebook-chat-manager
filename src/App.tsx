@@ -1,46 +1,31 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React from 'react';
 
-import Loader from 'containers/loader';
-import PageList, { IPage } from 'containers/pagelist';
-import FBLoginButton from 'components/FBLogin';
+import Routes from 'app/routes';
 
 import { makeStyles } from '@material-ui/core/styles';
-import { ILogin } from 'contexts/login';
-
-import fbApi from 'api/fb';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
+    flexDirection: 'column',
+    padding: '5px',
+    paddingTop: '10px',
   },
 }));
 
-interface IAppProps {
-  login: ILogin;
-}
+export type IEventCallbackVoid = (event: any) => void;
+interface IAppContext {}
 
-const App: React.FC<IAppProps> = ({ login }) => {
+export const AppContext = React.createContext<IAppContext>({});
+
+const App: React.FC = () => {
   const classes = useStyles();
-  const [pages, setPages] = useState<IPage[]>([]);
-  const [selectedPage, setSelectedPage] = useState<string>('');
-
-  useEffect(() => {
-    (async () => {
-      if (login.state.loggedIn) {
-        const { data: pages } = await fbApi.getPages(login.state.accessToken);
-
-        setPages(pages);
-      }
-    })();
-  }, [login.state, setPages]);
 
   return (
     <div className={classes.root}>
-      <Suspense fallback={<Loader />}></Suspense>
-      {pages.length && (
-        <PageList pages={pages} setSelectedPage={setSelectedPage} />
-      )}
-      {login.state.loggedIn && <FBLoginButton login={login} />}
+      <AppContext.Provider value={{}}>
+        <Routes />
+      </AppContext.Provider>
     </div>
   );
 };

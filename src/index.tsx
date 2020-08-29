@@ -1,32 +1,30 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom';
-import { Provider, Subscribe } from 'unstated';
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
 
-import './index.css';
+import { store, history } from 'app/store';
 
 import ErrorBoundary from './containers/errorboundary';
-
-import Lang from 'contexts/lang';
-import Login, { ILogin } from 'contexts/login';
+import Loader from 'containers/loader';
 
 import App from './App';
 
-// Login
-// Filter
-// Cart
-// Pagination
+import './index.css';
+import { ConnectedRouter } from 'connected-react-router';
 
 ReactDOM.render(
   <React.StrictMode>
     <ErrorBoundary>
-      <Provider inject={[Lang, Login]}>
-        <Subscribe to={[Login]}>
-          {(login) => {
-            // @ts-ignore
-            return <App login={login} />;
-          }}
-        </Subscribe>
-      </Provider>
+      <BrowserRouter>
+        <Provider store={store}>
+          <ConnectedRouter history={history}>
+            <Suspense fallback={<Loader />}>
+              <App />
+            </Suspense>
+          </ConnectedRouter>
+        </Provider>
+      </BrowserRouter>
     </ErrorBoundary>
   </React.StrictMode>,
   document.getElementById('root')
