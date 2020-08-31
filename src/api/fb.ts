@@ -46,7 +46,11 @@ export const getLiveVideos = (
     //   list: data,
     // });
 
-    resolve(data);
+    const videos = (data as IVideo[]).filter(
+      (video) => video.status === 'LIVE'
+    );
+
+    resolve(videos);
   });
 };
 

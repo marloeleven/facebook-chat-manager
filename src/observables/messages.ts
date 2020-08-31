@@ -83,6 +83,8 @@ connect$
     es.addEventListener('message', ({ data }) => {
       const message = JSON.parse(data);
 
-      messages$.next(message);
+      if (message.from && message.from.id && message.from.name) {
+        messages$.next(message);
+      }
     });
   });
