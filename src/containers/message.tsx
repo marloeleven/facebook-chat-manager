@@ -74,11 +74,13 @@ const MessageList: React.FC<{
   className: string;
   onClick: Function;
 }> = ({ messages, className, onClick }) => (
-  <List className={className}>
-    {messages.map((message) => (
-      <Message key={message.id} {...message} onClick={onClick} />
-    ))}
-  </List>
+  <div className='flex flex-column overflow-y-auto'>
+    <List className={className}>
+      {messages.map((message) => (
+        <Message key={message.id} {...message} onClick={onClick} />
+      ))}
+    </List>
+  </div>
 );
 
 export default () => {
@@ -132,11 +134,12 @@ export default () => {
   });
 
   return (
-    <Grid container spacing={0}>
-      <Grid container spacing={0} xs={4} className='flex-col'>
+    <Grid container spacing={1}>
+      <Grid item xs={4} className='flex-col'>
         <TextField
           label='Filter Message'
           variant='outlined'
+          className='w-full'
           value={filter}
           onChange={onChange}
         />
@@ -146,12 +149,13 @@ export default () => {
           onClick={onSaveMessage}
         />
       </Grid>
-      <Grid container spacing={0} xs={4} className='flex-col'>
+      <Grid item xs={4} className='flex-col'>
         <Typography
           component='span'
-          variant='subtitle2'
-          className='inline'
+          variant='h6'
+          className='text-center block'
           color='textPrimary'
+          style={{ height: '56px' }}
         >
           Saved Messages
         </Typography>
